@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self';" />
+  <title>ClipVault capture</title>
+  <link rel="stylesheet" href="capture.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+  <div id="guideX" class="guide"></div>
+  <div id="guideY" class="guide"></div>
+  <div id="shade"></div>
+  <div id="frame" class="hidden">
+    <span class="handle tl"></span><span class="handle tr"></span>
+    <span class="handle bl"></span><span class="handle br"></span>
+    <div id="size"></div>
+  </div>
+  <div id="flash"></div>
+  <div id="hint">
+    <span>Drag to select</span>
+    <span><kbd>Shift</kbd> square</span>
+    <span><kbd>Enter</kbd> capture</span>
+    <span><kbd>Esc</kbd> cancel</span>
+  </div>
+  <script src="capture.js"></script>
+</body>
+</html>

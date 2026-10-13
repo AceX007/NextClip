@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and local state
+*.log
+npm-debug.log*
+
+# Local vault data (never commit real clipboard history)
+vault.json
+settings.json
+clipvault.log
+
+# Env
+.env
+.env.*

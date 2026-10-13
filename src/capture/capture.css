@@ -1,0 +1,134 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  cursor: crosshair;
+  user-select: none;
+  font: 12px "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}
+
+body.dragging { cursor: move; }
+
+#stage { position: fixed; inset: 0; display: block; }
+
+/* Crosshair guides: thin lines that follow the cursor edge to edge. */
+.guide {
+  position: fixed;
+  pointer-events: none;
+  background: rgba(255, 255, 255, .28);
+  display: none;
+}
+#guideX { top: 0; bottom: 0; width: 1px; }
+#guideY { left: 0; right: 0; height: 1px; }
+
+/* Dim everything outside the selection. */
+#shade {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, .45);
+  display: none;
+}
+
+/* Selection outline with corner handles. */
+#frame {
+  position: fixed;
+  pointer-events: none;
+  border: 1px solid #6c8cff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 0 22px rgba(108, 140, 255, .35);
+}
+
+#frame::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid rgba(108, 140, 255, .55);
+  animation: ants 2.4s linear infinite;
+}
+@keyframes ants {
+  to { transform: translate(1px, 1px); }
+}
+
+.handle {
+  position: absolute;
+  width: 7px; height: 7px;
+  background: #fff;
+  border: 1.5px solid #6c8cff;
+  border-radius: 2px;
+}
+.handle.tl { top: -4px; left: -4px; }
+.handle.tr { top: -4px; right: -4px; }
+.handle.bl { bottom: -4px; left: -4px; }
+.handle.br { bottom: -4px; right: -4px; }
+
+#size {
+  position: absolute;
+  top: -26px;
+  left: -1px;
+  background: #6c8cff;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .35);
+}
+#size.flip { top: auto; bottom: -26px; }
+
+/* Hint pill */
+#hint {
+  position: fixed;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(18, 20, 26, .82);
+  border: 1px solid rgba(255, 255, 255, .1);
+  color: #eef1f7;
+  padding: 8px 15px;
+  border-radius: 999px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  animation: hintIn .28s cubic-bezier(.32, .72, 0, 1);
+  transition: opacity .35s ease, transform .35s ease;
+}
+@keyframes hintIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+#hint.fading { opacity: 0; transform: translate(-50%, -8px); }
+
+#hint kbd {
+  background: rgba(255, 255, 255, .14);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font: inherit;
+  font-size: 11px;
+}
+
+/* Brief flash over the captured region. */
+#flash {
+  position: fixed;
+  pointer-events: none;
+  background: #fff;
+  opacity: 0;
+  display: none;
+}
+#flash.go { display: block; animation: flash .32s ease-out; }
+@keyframes flash {
+  0%   { opacity: .85; }
+  100% { opacity: 0; }
+}
+
+.hidden { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  #hint, #flash, #frame::before { animation: none; }
+  #frame::before { display: none; }
+}

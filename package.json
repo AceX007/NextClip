@@ -1,0 +1,17 @@
+{
+  "name": "clipvault",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lightweight encrypted clipboard history manager for text and images",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/vault.test.js",
+    "test:e2e": "electron test/smoke.js",
+    "test:autostart": "electron test/autostart.js",
+    "seed": "node test/seed-live.js"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

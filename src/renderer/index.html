@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self';" />
+  <title>ClipVault</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand">
+      <span class="dot" id="statusDot"></span>
+      <span class="brand-name">ClipVault</span>
+      <span class="brand-sub" id="statusText">locked</span>
+    </div>
+    <div class="titlebar-actions">
+      <button id="btnShot" class="icon-btn" title="Screenshot a region (Ctrl+Shift+S)" aria-label="Screenshot a region">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8.5A2 2 0 0 1 5 6.5h2.2l1.2-2h7.2l1.2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <circle cx="12" cy="13" r="3.4"/>
+        </svg>
+      </button>
+      <button id="btnLock" class="icon-btn" title="Lock now (Ctrl+L)" aria-label="Lock vault">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>
+          <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/>
+          <circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+      <button id="btnSettings" class="icon-btn" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4 7h10M18 7h2M4 17h4M12 17h8"/>
+          <circle cx="16" cy="7" r="2.1"/><circle cx="10" cy="17" r="2.1"/>
+        </svg>
+      </button>
+      <button id="btnClose" class="icon-btn danger" title="Hide (Esc)" aria-label="Hide panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ---------------------------------------------------------- lock screen -->
+  <section id="lockScreen" class="lock-screen hidden">
+    <div class="lock-inner">
+      <div class="lock-art" aria-hidden="true">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+          <path d="M7 10V7a5 5 0 0 1 10 0v3" stroke="#6c8cff" stroke-width="2" stroke-linecap="round"/>
+          <rect x="4" y="10" width="16" height="11" rx="2.5" fill="#6c8cff"/>
+          <circle cx="12" cy="15" r="1.6" fill="#101828"/>
+          <rect x="11.2" y="15" width="1.6" height="3.4" rx="0.8" fill="#101828"/>
+        </svg>
+      </div>
+      <h1 id="lockTitle">Unlock your vault</h1>
+      <p id="lockHint" class="muted">Your clipboard history is encrypted with AES-256-GCM.</p>
+      <form id="passForm" autocomplete="off">
+        <input id="passInput" type="password" placeholder="Passphrase" autocomplete="current-password" spellcheck="false" />
+        <input id="passConfirm" type="password" placeholder="Repeat passphrase" autocomplete="new-password" spellcheck="false" class="hidden" />
+        <button id="passSubmit" type="submit" class="primary">Unlock</button>
+      </form>
+      <p id="lockError" class="error hidden"></p>
+      <p class="muted tiny" id="lockFootnote"></p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- history -->
+  <section id="historyScreen" class="history hidden">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <input id="search" type="search" placeholder="Search clipboard…" spellcheck="false" />
+        <button id="searchClear" class="search-clear" title="Clear search" aria-label="Clear search">×</button>
+      </div>
+      <div class="result-count" id="resultCount"></div>
+      <div class="seg" id="seg" style="--seg-index: 0">
+        <div class="seg-indicator" aria-hidden="true"></div>
+        <button class="chip active" data-filter="all">All<span class="count" data-count="all"></span></button>
+        <button class="chip" data-filter="text">Text<span class="count" data-count="text"></span></button>
+        <button class="chip" data-filter="image">Images<span class="count" data-count="image"></span></button>
+        <button class="chip" data-filter="pinned">Pinned<span class="count" data-count="pinned"></span></button>
+      </div>
+    </div>
+
+    <div id="list" class="list" tabindex="0" role="listbox" aria-label="Clipboard history"></div>
+
+    <div id="empty" class="empty hidden">
+      <div class="empty-art" id="emptyArt"></div>
+      <p id="emptyText">Nothing copied yet.</p>
+      <p class="muted tiny" id="emptyHint"></p>
+    </div>
+
+    <footer class="footer">
+      <span id="counts" class="muted tiny"></span>
+      <div class="footer-actions">
+        <span id="retentionNote" class="muted tiny"></span>
+        <button id="btnPause" class="link-btn">Pause capture</button>
+        <button id="btnClear" class="link-btn danger">Clear all</button>
+      </div>
+    </footer>
+    <div id="keyHints" class="key-hints">
+      <span><kbd>P</kbd> pin</span><span><kbd>S</kbd> save</span>
+      <span><kbd>/</kbd> search</span><span><kbd>↑↓</kbd> move</span><span><kbd>Enter</kbd> copy back</span>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ settings -->
+  <section id="settingsScreen" class="settings hidden">
+    <h2>Settings</h2>
+    <label class="row">
+      <span>Toggle panel hotkey</span>
+      <input id="setHotkey" type="text" spellcheck="false" placeholder="Control+Shift+V" />
+    </label>
+    <p class="muted tiny" id="hotkeyStatus"></p>
+
+    <label class="row">
+      <span>Max entries</span>
+      <input id="setMax" type="number" min="20" max="2000" step="10" />
+    </label>
+
+    <label class="row">
+      <span>Auto-lock after (minutes, 0 = never)</span>
+      <input id="setAutoLock" type="number" min="0" max="240" step="1" />
+    </label>
+
+    <h3>Appearance</h3>
+    <label class="row">
+      <span>Density</span>
+      <select id="setDensity">
+        <option value="comfortable">Comfortable</option>
+        <option value="compact">Compact</option>
+      </select>
+    </label>
+
+    <label class="row">
+      <span>Hide panel when it loses focus</span>
+      <input id="setHideOnBlur" type="checkbox" />
+    </label>
+
+    <label class="row">
+      <span>Hide the panel after copying an entry back</span>
+      <input id="setHideOnRestore" type="checkbox" />
+    </label>
+
+    <label class="row">
+      <span>Start ClipVault when I sign in</span>
+      <input id="setAutoStart" type="checkbox" />
+    </label>
+    <p class="muted tiny" id="autoStartNote"></p>
+
+    <label class="row">
+      <span>Capture images as well as text</span>
+      <input id="setCaptureImages" type="checkbox" />
+    </label>
+
+    <h3>Retention</h3>
+    <label class="row">
+      <span>Auto-delete unpinned items after (hours, 0 = never)</span>
+      <input id="setRetention" type="number" min="0" max="8760" step="1" />
+    </label>
+    <p class="muted tiny">Pinned items are never deleted automatically.</p>
+
+    <h3>Screenshots</h3>
+    <label class="row">
+      <span>Screenshot hotkey</span>
+      <input id="setShotHotkey" type="text" spellcheck="false" placeholder="Control+Shift+S" />
+    </label>
+    <p class="muted tiny" id="shotHotkeyStatus"></p>
+
+    <label class="row">
+      <span>Also save screenshots to disk</span>
+      <input id="setAutoSaveShots" type="checkbox" />
+    </label>
+    <button id="btnShotNow" class="link-btn left">Take a screenshot now</button>
+    <button id="btnOpenShotDir" class="link-btn left">Open screenshots folder</button>
+
+    <h3>Change passphrase</h3>
+    <input id="passCurrent" type="password" placeholder="Current passphrase" spellcheck="false" />
+    <input id="passNew" type="password" placeholder="New passphrase (min 6)" spellcheck="false" />
+    <input id="passNew2" type="password" placeholder="Repeat new passphrase" spellcheck="false" />
+    <button id="btnChangePass" class="primary">Update passphrase</button>
+    <p id="settingsMessage" class="muted tiny"></p>
+
+    <div class="settings-footer">
+      <button id="btnReveal" class="link-btn">Show vault file in folder</button>
+      <button id="btnDone" class="primary">Done</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast hidden">
+    <span id="toastText"></span>
+    <button id="toastAction" class="toast-action hidden"></button>
+  </div>
+
+  <div id="rowMenu" class="row-menu hidden" role="menu"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
