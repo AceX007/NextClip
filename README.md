@@ -1,10 +1,10 @@
-# ClipVault
+# NextClip
 
 A lightweight, encrypted clipboard history panel for Windows (Electron, ~90 MB installed, no server, no network access).
 
 Copy anything — text or images — and it lands in an encrypted history you can search, pin and paste back from with one hotkey. It also doubles as a screenshot tool.
 
-![ClipVault panel](preview.png)
+![NextClip panel](preview.png)
 
 ## What it does
 
@@ -15,6 +15,9 @@ Copy anything — text or images — and it lands in an encrypted history you ca
 - **Region screenshots** with one hotkey: freeze the screen, drag out an area, and it lands on the clipboard and in the history — save it to disk if you want to keep it.
 - **Search, filter and restore.** `All / Text / Images / Pinned` chips plus full-text search; click any row to put it back on the clipboard.
 - **Auto-locks** after an idle timeout, dropping the key from memory.
+- **Black theme throughout.** The panel, bubble, settings, capture overlay and native controls use a consistent dark palette.
+- **Launcher bubble.** Keep the bubble pinned on screen, or hide it with a right-click and restore it from Settings or the tray.
+- **Remembered unlock.** Optionally keep the vault unlocked across restarts on the same Windows boot, with an expiry you control.
 
 ## Quick start
 
@@ -27,6 +30,8 @@ On first run the panel asks you to create a vault. Pick a passphrase — it is n
 
 Press **Ctrl+Shift+V** anywhere to show/hide the panel. It also lives in the system tray (padlock icon).
 
+The black launcher bubble stays on screen while the panel is closed. Right-click it to hide it. Restore it with **Pin bubble on screen** in the tray menu, or enable the same switch in **Settings → Panel** and press **Done**. Your choice is remembered after restarting. The panel hotkey and tray continue to work while the bubble is hidden.
+
 ## Screenshots
 
 Press **Ctrl+Shift+S** and the screen freezes under a selection overlay.
@@ -38,7 +43,7 @@ Press **Ctrl+Shift+S** and the screen freezes under a selection overlay.
 | Confirm | `Enter` or release the mouse |
 | Cancel | `Esc` (also cancels if you click away) |
 
-The captured region goes straight to the clipboard, so the monitor files it into the encrypted history like any other copy — it shows up as a normal image entry you can restore or save later. Turn on **Also save screenshots to disk** in settings to additionally write each shot to `Pictures/ClipVault` with a timestamped name, or press `S` on any image in the history to save it anywhere you like.
+The captured region goes straight to the clipboard, so the monitor files it into the encrypted history like any other copy — it shows up as a normal image entry you can restore or save later. Turn on **Also save screenshots to disk** in settings to additionally write each shot to `Pictures/NextClip` with a timestamped name, or press `S` on any image in the history to save it anywhere you like.
 
 Notes on the capture:
 
@@ -85,18 +90,18 @@ Re-copying an item refreshes its timestamp, so anything you actively use stays.
 
 The panel is built to get out of the way:
 
-- A rounded, translucent card with a real drop shadow, so it reads as a floating tool rather than a rectangle pasted over your work.
+- A rounded black panel with charcoal surfaces, subtle borders, and dark native controls and dialogs.
 - The window itself fades in and out at the OS level, so opening and closing is smooth without any flash.
-- Rows stagger in, hover states stay subtle, and pinning pops the star.
+- Rows stagger in, hover states stay subtle, and pinned entries show a star.
 - Search highlights the matched text, shows a live match count, and has a one-click clear button; the filter chips carry their own counts.
 - Empty states explain what to do next instead of just saying "nothing here".
 - Everything animated respects `prefers-reduced-motion`.
 
 ## Starting with your system
 
-ClipVault **starts automatically when you sign in** and lives quietly in the tray — the panel only appears when you ask for it.
+NextClip **starts automatically when you sign in** and lives quietly in the tray — the panel only appears when you ask for it.
 
-- On by default. Toggle it in **Settings → Start ClipVault when I sign in**; the switch reflects what the OS actually reports, not just what you asked for.
+- On by default. Toggle it in **Settings → Start NextClip when I sign in**; the switch reflects what the OS actually reports, not just what you asked for.
 - Registering and reading the login item use the same executable and arguments, so the switch can't disagree with reality.
 - When running from source (not packaged) the login entry points at the Electron binary plus this project path. That works, but it is machine- and folder-specific — the Settings panel says so explicitly. A packaged build registers a single clean executable path.
 
@@ -143,9 +148,10 @@ Open with the **settings** button in the title bar.
 - Auto-delete unpinned items after N hours (default 72, 0 = never)
 - Auto-lock timeout in minutes (0 = never)
 - Density: comfortable or compact
+- Pin the launcher bubble on screen, or hide it and use the tray or hotkey
 - Hide on blur (default on — this is what makes it feel like a panel)
 - Hide the panel after copying an entry back
-- Start ClipVault when I sign in (default on)
+- Start NextClip when I sign in (default on)
 - Capture images on/off
 - Also save screenshots to disk, plus a shortcut to the screenshots folder
 - Change passphrase — every blob is re-encrypted under the new key
@@ -153,7 +159,8 @@ Open with the **settings** button in the title bar.
 ## Tests
 
 ```bash
-npm test              # vault engine, undo and retention (24 checks)
+npm test              # vault, remembered login, boot detection and bubble (100 checks)
+npm run test:ui       # hidden UI checks with fixtures; no live clipboard or vault access
 npm run test:e2e      # drives the real Windows clipboard under Electron (31 checks)
 npm run test:autostart # real login-item API, restores prior state afterwards
 npm run seed          # fills the live vault with sample data for UI work
@@ -170,6 +177,8 @@ src/
   crypto-store.js    the vault: scrypt, AES-256-GCM, sealed metadata, retention sweep
   icon.js            tiny PNG encoder + generated tray icon (no image assets)
   preload.js         contextBridge surface for the panel
+  bubble-window.js   always-on-top launcher bubble and pin/unpin state
+  bubble/            bubble renderer and its black-theme surface
   capture/           screenshot selection overlay (runs after the screen is frozen)
   renderer/          panel UI
 test/

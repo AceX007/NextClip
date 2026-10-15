@@ -26,3 +26,6 @@ clipvault.log
 # Env
 .env
 .env.*
+
+# Legacy/local helper output
+.hook/

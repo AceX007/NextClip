@@ -16,8 +16,8 @@ const on = (channel) => (handler) => {
 
 contextBridge.exposeInMainWorld('clipvault', {
   status: () => ipcRenderer.invoke('vault:status'),
-  create: (passphrase) => ipcRenderer.invoke('vault:create', passphrase),
-  unlock: (passphrase) => ipcRenderer.invoke('vault:unlock', passphrase),
+  create: (passphrase, remember) => ipcRenderer.invoke('vault:create', passphrase, remember),
+  unlock: (passphrase, remember) => ipcRenderer.invoke('vault:unlock', passphrase, remember),
   lock: () => ipcRenderer.invoke('vault:lock'),
   list: () => ipcRenderer.invoke('vault:list'),
   restore: (id) => ipcRenderer.invoke('vault:restore', id),
@@ -39,5 +39,6 @@ contextBridge.exposeInMainWorld('clipvault', {
   onState: on('vault:state'),
   onChanged: on('vault:changed'),
   onShown: on('panel:shown'),
+  onOpenSettings: on('panel:open-settings'),
   onToast: on('toast'),
 });

@@ -1,13 +1,15 @@
 {
-  "name": "clipvault",
+  "name": "nextclip",
+  "productName": "NextClip",
   "version": "1.0.0",
   "private": true,
-  "description": "Lightweight encrypted clipboard history manager for text and images",
+  "description": "NextClip — lightweight encrypted clipboard history manager for text and images",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "test": "node test/vault.test.js",
+    "test": "node test/vault.test.js && node test/remember-login.test.js && node test/boot-id.test.js && node test/bubble-window.test.js && node test/bubble-input.test.js && node test/bubble-settings.test.js",
     "test:e2e": "electron test/smoke.js",
+    "test:ui": "node test/run-ui.js",
     "test:autostart": "electron test/autostart.js",
     "seed": "node test/seed-live.js"
   },
